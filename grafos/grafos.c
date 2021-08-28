@@ -3,10 +3,11 @@
 /*
 ** Detalhes:
 **
-** Grafo ponderado e não orientado.
+** Grafo ponderado.
 ** A implementação foi feita como uma lista encadeada simples, sem cabeça (typedef Vertice).
-** O typedef Grafo contém o número de vértices e um ponteiro para um Vertice,
-** representando um vetor onde cada elemento é uma lista de vértices.
+** O typedef Grafo contém o número de vértices, a orientação do gráfico (bool)
+** e um ponteiro para um Vertice, representando um vetor onde cada elemento é 
+** uma lista de vértices.
 ** Cada vértice tem o valor v (id do vérticee índice usado no vetor de listas)
 ** e o peso para o próximo vértice da lista. 
 **
@@ -26,6 +27,7 @@ typedef struct Vertice {
 // grafo representado por um array de vértices (Vertice)
 typedef struct Grafo {
 	int n;              // número de vértices
+	int orientado;		// grafo orientado = 1; ñ orientado = 0
 	Vertice *vertices; // lista de adjacência
 } Grafo;
 
@@ -57,6 +59,9 @@ int main() {
 	printf("Número de arestas:\n");
 	scanf("%d", &n_arestas);
 
+	printf("Grafo orientado? (Sim = 1; Não = 0):\n");
+	scanf("%d", &grafo.orientado);
+
 
 	printf("Arestas: (ant. próx. peso)\n");
 	for (int i = 0; i < n_arestas; ++i) {
@@ -68,7 +73,6 @@ int main() {
 
 	// free
 	free_grafo(&grafo);
-	// free(arestas);
 }
 
 
@@ -101,16 +105,19 @@ void adiciona_aresta(Grafo *grafo, Aresta aresta) {
 	ultimo->v = aresta.prox;
 	ultimo->peso = aresta.peso;
 	
-	// // encontra o último vértice da lista
-	ultimo = &grafo->vertices[aresta.prox];
-	while (ultimo->prox != NULL) {
-		ultimo = ultimo->prox;
-	}
+	if (!(grafo->orientado)) {
+		// se o gráfico não é orientado
+		// faz o caminho reverso também
+		ultimo = &grafo->vertices[aresta.prox];
+		while (ultimo->prox != NULL) {
+			ultimo = ultimo->prox;
+		}
 
-	ultimo->prox = (Vertice *) malloc(sizeof(Vertice));
-	ultimo->prox->prox = NULL;
-	ultimo->v = aresta.ant;
-	ultimo->peso = aresta.peso;
+		ultimo->prox = (Vertice *) malloc(sizeof(Vertice));
+		ultimo->prox->prox = NULL;
+		ultimo->v = aresta.ant;
+		ultimo->peso = aresta.peso;
+	}
 
 }
 
@@ -122,10 +129,10 @@ void print_grafo(Grafo grafo) {
 	for (int i = 0; i < grafo.n; ++i) {
 		printf("[%d] -> ", i);
 		vertice = grafo.vertices[i];
-		do {
+		while (vertice.prox != NULL) {
 			printf("[%d; %d] -> ", vertice.v, vertice.peso);
 			vertice = *vertice.prox;
-		} while (vertice.prox != NULL);
+		}
 		printf("NULL\n");
 	}
 }
