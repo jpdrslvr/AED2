@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 /*
 ** Detalhes:
 **
@@ -15,8 +13,11 @@
 ** contendo o vértice anterior, o próximo e o peso. 
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 // número máximo de nós
-#define MAX 20
+#define MAX_VERTICES 20
 
 // structs
 typedef struct Vertice {
@@ -38,30 +39,29 @@ typedef struct Aresta {
 } Aresta;
 
 // funções
-Grafo cria_grafo(int n);
+Grafo cria_grafo(int n_vertices, int orientado);
 void adiciona_aresta(Grafo *grafo, Aresta aresta);
 void print_grafo(Grafo grafo);
 void free_grafo(Grafo *grafo);
 void free_vertice(Vertice *vertice);
 
 int main() {
-	Aresta aresta; // vetor de arestas
-	int n_arestas, n_vertices;
+	Aresta aresta;
+	int n_arestas, n_vertices, orientado;
 	Grafo grafo;
 
 	do{
 		printf("Número de vértices: (máx. 20)\n");
 		scanf("%d", &n_vertices);
-	} while (n_vertices > MAX || n_vertices <= 0);
-
-	grafo = cria_grafo(n_vertices);
+	} while (n_vertices > MAX_VERTICES || n_vertices <= 0);
 
 	printf("Número de arestas:\n");
 	scanf("%d", &n_arestas);
 
 	printf("Grafo orientado? (Sim = 1; Não = 0):\n");
-	scanf("%d", &grafo.orientado);
+	scanf("%d", &orientado);
 
+	grafo = cria_grafo(n_vertices, orientado);
 
 	printf("Arestas: (ant. próx. peso)\n");
 	for (int i = 0; i < n_arestas; ++i) {
@@ -76,14 +76,15 @@ int main() {
 }
 
 
-Grafo cria_grafo(int n) {
+Grafo cria_grafo(int n_vertices, int orientado) {
 
 	Grafo grafo;
-	grafo.n = n;
-	grafo.vertices = (Vertice *) malloc(sizeof(Vertice) * n); // cria n vértices no grafo
+	grafo.n = n_vertices;
+	grafo.orientado = orientado;
+	grafo.vertices = (Vertice *) malloc(sizeof(Vertice) * n_vertices); // cria n vértices no grafo
 
 	// inicializa os vértices apontando para NULL
-	for (int i = 0; i < n; ++i) {
+	for (int i = 0; i < n_vertices; ++i) {
 		grafo.vertices[i].prox = NULL;
 	}
 
@@ -94,29 +95,30 @@ Grafo cria_grafo(int n) {
 
 void adiciona_aresta(Grafo *grafo, Aresta aresta) {
 
-	// encontra o último vértice da lista
-	Vertice *ultimo = &grafo->vertices[aresta.ant];
-	while (ultimo->prox != NULL) {
-		ultimo = ultimo->prox;
-	}
+	Vertice *ultimo;
 
-	ultimo->prox = (Vertice *) malloc(sizeof(Vertice));
-	ultimo->prox->prox = NULL;
-	ultimo->v = aresta.prox;
-	ultimo->peso = aresta.peso;
-	
-	if (!(grafo->orientado)) {
-		// se o gráfico não é orientado
-		// faz o caminho reverso também
-		ultimo = &grafo->vertices[aresta.prox];
+	for (int i = 0; i < 2; i++) {
+		// encontra o último vértice da lista
+		ultimo = &grafo->vertices[aresta.ant];
 		while (ultimo->prox != NULL) {
 			ultimo = ultimo->prox;
 		}
 
 		ultimo->prox = (Vertice *) malloc(sizeof(Vertice));
 		ultimo->prox->prox = NULL;
-		ultimo->v = aresta.ant;
+		ultimo->v = aresta.prox;
 		ultimo->peso = aresta.peso;
+
+		// se o gráfico não é orientado
+		// swap arestas pra fazer
+		// o caminho reverso
+		if (!(grafo->orientado)) {
+			
+			int aux = aresta.ant;
+			aresta.ant = aresta.prox;
+			aresta.prox = aux;
+
+		} else break;
 	}
 
 }
