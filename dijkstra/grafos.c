@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "grafos.h"
 
 static void free_vertice(Vertice *vertice);
@@ -33,9 +35,7 @@ void adiciona_aresta(Grafo *grafo, Aresta aresta) {
 		ultimo->v = aresta.prox;
 		ultimo->peso = aresta.peso;
 
-		// se o gráfico não é orientado
-		// swap arestas pra fazer
-		// o caminho reverso
+		// se o gráfico não é orientado swap arestas pra fazer o caminho reverso
 		if (!(grafo->orientado)) {
 			
 			int aux = aresta.ant;

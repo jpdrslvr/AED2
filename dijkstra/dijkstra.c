@@ -6,8 +6,8 @@
 #define MAX_VERTICES 20
 
 void dijkstra(Grafo grafo, int inicio, int *dist, int *anterior);
-void print_caminho(int inicio, int fim, int *dist, int *anterior);
 void print_dijkstra(int *dist, int *anterior, int n);
+void print_caminho(int inicio, int fim, int *dist, int *anterior);
 int menor_caminho_rec(int inicio, int fim, int *dist, int *anterior, int custo);
 
 int main() {
@@ -43,19 +43,19 @@ int main() {
 	printf("\nAlgoritmo de Dijkstra:\n");
 
 	// // aloca vetores para as distâncias e vértices anteriores
-	int *dist = (int *) malloc(sizeof(int) * n_vertices);
+	int *dist     = (int *) malloc(sizeof(int) * n_vertices);
 	int *anterior = (int *) malloc(sizeof(int) * n_vertices);
 	
 	int inicio, fim, continuar = 1;
 
 	while (continuar == 1) {
-		printf("Vértices para o caminho mínimo:\n");
+		printf("Início e fim:\n");
 		scanf("%d %d", &inicio, &fim);
 		
+		printf("Menor caminho (de %d a %d):\n", inicio, fim);
 		dijkstra(grafo, inicio, dist, anterior);
 		print_dijkstra(dist, anterior, grafo.n);
 		
-		printf("Menor caminho:\n");
 		print_caminho(inicio, fim, dist, anterior);
 
 		printf("\nContinuar?(S = 1, N = 0)\n");
@@ -145,16 +145,14 @@ void print_dijkstra(int *dist, int *anterior, int n) {
 // função para imprimir o menor caminho
 void print_caminho(int inicio, int fim, int *dist, int *anterior) {
 	int custo = menor_caminho_rec(inicio, fim, dist, anterior, 0);
-	if (custo == -1) printf("Caminho %d -> %d impossível.\n", inicio, fim);
-	else printf("; custo = %d\n", custo);
+	if (custo == -1) printf("Caminho %d -> %d não é possível.\n", inicio, fim);
+	else printf("\nDistância = %d\n", custo);
 }
 
 // função auxiliar pra imprimir o menor caminho recursivamente
 int menor_caminho_rec(int inicio, int fim, int *dist, int *anterior, int custo) {
 	if(inicio != fim) {
-		if (dist[fim] == INT_MAX) {
-			return -1;
-		}
+		if (dist[fim] == INT_MAX) return -1;
 
 		custo += dist[fim];
 
